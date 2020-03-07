@@ -15,20 +15,24 @@ class ProductList {
 </div>`;
     this.el.addEventListener('click', (event) => {
       if (event.target.dataset.buttonRole !== 'add-to-cart') {return;}
-      if (this.products) {
-        this.products = localStorage.getItem('productsStoreKey').split('').filter(Number);
-      }
       let div = event.target.closest('.products-list-product');
-      if (this.products.includes(div.dataset.productId)) {return;}
-      if (confirm('Вы уверенны, что хотите добавить этот товар в корзину?')) {
-        this.products.push(div.dataset.productId);
+      if (this.products) {
+        this.products = String(this.products).split('').filter(Number);
+        if (confirm('Вы уверенны, что хотите добавить этот товар в корзину?')) {
+          if (this.products.includes(div.dataset.productId)) {return;}
+          this.products.push(div.dataset.productId);
+        }
+      } else {
+        if (confirm('Вы уверенны, что хотите добавить этот товар в корзину?')) {
+          this.products = [div.dataset.productId];
+        }
       }
       localStorage.setItem('productsStoreKey', JSON.stringify(this.products));
     });
   }
 
   show() {
-    fetch(this.productsUrl, { method: 'GET' })
+    return fetch(this.productsUrl, { method: 'GET' })
       .then((response) => response.json())
       .then((result) => {
         for (let i = 0; i < result.length; i++) {
