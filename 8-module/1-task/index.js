@@ -4,7 +4,7 @@ class ProductList {
 
   constructor(element) {
     this.el = element;
-    this.products = localStorage.getItem('productsStoreKey');
+    this.products = [];
     this.el.innerHTML = `<div class="row justify-content-end">
     <div class="col-lg-9">
         <h3 class="section-title">Top Recommendations for You</h3>
@@ -13,22 +13,6 @@ class ProductList {
         </div>
     </div>
 </div>`;
-    this.el.addEventListener('click', (event) => {
-      if (event.target.dataset.buttonRole !== 'add-to-cart') {return;}
-      let div = event.target.closest('.products-list-product');
-      if (this.products) {
-        this.products = String(this.products).split('').filter(Number);
-        if (confirm('Вы уверенны, что хотите добавить этот товар в корзину?')) {
-          if (this.products.includes(div.dataset.productId)) {return;}
-          this.products.push(div.dataset.productId);
-        }
-      } else {
-        if (confirm('Вы уверенны, что хотите добавить этот товар в корзину?')) {
-          this.products = [div.dataset.productId];
-        }
-      }
-      localStorage.setItem('productsStoreKey', JSON.stringify(this.products));
-    });
   }
 
   show() {
@@ -77,6 +61,21 @@ class ProductList {
                 <span class="rate-amount ml-2">${result[i].rating.reviewsAmount}</span>`);
           }
         }
+        this.el.addEventListener('click', (event) => {
+          if (event.target.dataset.buttonRole !== 'add-to-cart') {return;}
+          let div = event.target.closest('.products-list-product');
+          if (localStorage.getItem(this.productsStoreKey)) {
+            if (confirm('Вы уверенны, что хотите добавить этот товар в корзину?')) {
+              if (this.products.includes(result[+div.dataset.productId - 1])) {return;}
+              this.products.push(result[+div.dataset.productId - 1]);
+            }
+          } else {
+            if (confirm('Вы уверенны, что хотите добавить этот товар в корзину?')) {
+              this.products.push(result[+div.dataset.productId - 1]);
+            }
+          }
+          localStorage.setItem(this.productsStoreKey, JSON.stringify(this.products));
+        });
       });
   }
 }
